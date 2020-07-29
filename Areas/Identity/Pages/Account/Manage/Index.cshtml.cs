@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using BiliWeb2.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -11,12 +12,12 @@ namespace BiliWeb2.Areas.Identity.Pages.Account.Manage
 {
     public partial class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<TechnicianModel> _userManager;
+        private readonly SignInManager<TechnicianModel> _signInManager;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+            UserManager<TechnicianModel> userManager,
+            SignInManager<TechnicianModel> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -35,9 +36,42 @@ namespace BiliWeb2.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+
+            [Display(Name = "Street")]
+            public string Street { get; set; }
+
+            [Display(Name = "City")]
+            public string City { get; set; }
+
+            [Display(Name = "State")]
+            public string State { get; set; }
+
+            [Display(Name = "Country")]
+            public string Country { get; set; }
+
+            [Display(Name = "Postal Code")]
+            public string PostalCode { get; set; }
+
+            [Display(Name = "Bio")]
+            public string Bio { get; set; }
+
+            [Display(Name = "Clinic")]
+            public string Clinic { get; set; }
+
+            [Display(Name = "Organization")]
+            public string Organization { get; set; }
+
+            [Display(Name = "EulaAccepted")]
+            public bool EulaAccepted { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(TechnicianModel user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
@@ -46,7 +80,18 @@ namespace BiliWeb2.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Street = user.Street,
+                City = user.City,
+                State = user.State,
+                Country = user.Country,
+                PostalCode = user.PostalCode,
+                Bio = user.Bio,
+                Clinic = user.ClinicID,
+                Organization = user.OrganizationID,
+                EulaAccepted = user.EulaAccepted
             };
         }
 
@@ -76,6 +121,16 @@ namespace BiliWeb2.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            user.FirstName = Input.FirstName;
+            user.LastName = Input.LastName;
+            user.Street = Input.Street;
+            user.City = Input.City;
+            user.State = Input.State;
+            user.Country = Input.Country;
+            user.PostalCode = Input.PostalCode;
+            user.Bio = Input.Bio;
+            user.PhoneNumber = Input.PhoneNumber;
+
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -85,6 +140,13 @@ namespace BiliWeb2.Areas.Identity.Pages.Account.Manage
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
+            }
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                var userId = await _userManager.GetUserIdAsync(user);
+                throw new InvalidOperationException($"Unexpected error occurred updating profile for user with ID '{userId}'.");
             }
 
             await _signInManager.RefreshSignInAsync(user);
