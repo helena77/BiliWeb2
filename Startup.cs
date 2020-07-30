@@ -13,6 +13,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BiliWeb2.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using BiliWeb2.Backend.Email;
 
 namespace BiliWeb2
 {
@@ -67,6 +69,8 @@ namespace BiliWeb2
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
                 options.SlidingExpiration = true;
             });
+
+            services.AddSingleton<IEmailSender, EmailSender>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -30,6 +30,10 @@ namespace BiliWeb2.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
+
+            // Update local cache
+            // UserHelper.SetCurrentUser(null);
+
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {
