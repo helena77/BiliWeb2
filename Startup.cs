@@ -15,6 +15,7 @@ using Microsoft.Extensions.Hosting;
 using BiliWeb2.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using BiliWeb2.Backend.Email;
+using Microsoft.AspNetCore.Authentication.Cookies;
 
 namespace BiliWeb2
 {
@@ -60,16 +61,17 @@ namespace BiliWeb2
 
             #endregion DbContext
 
+            #region Identity
+
             services.AddIdentity<TechnicianModel, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
-            services.AddRazorPages();
-
-            #region Password
 
             services.Configure<IdentityOptions>(options =>
             {
                 // Password settings.
+                // By default, Identity requires that passwords contain an uppercase character,
+                // lowercase character, a digit, and a non-alphanumeric character.
+                // Passwords must be at least six characters long.
                 options.Password.RequireDigit = true;
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
@@ -81,22 +83,50 @@ namespace BiliWeb2
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = false;
+
+                // Default SignIn settings.
+                options.SignIn.RequireConfirmedEmail = false;
+                options.SignIn.RequireConfirmedPhoneNumber = false;
             });
 
-            #endregion Password
+            #endregion Identity
 
+            #region Cookie
+
+            // Configure the app's cookie
             services.ConfigureApplicationCookie(options =>
             {
-                // Cookie settings
-                options.Cookie.HttpOnly = true;
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-
-                options.LoginPath = "/Identity/Account/Login";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.Cookie.Name = "YourAppCookieName";
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);
+                options.LoginPath = "/Identity/Account/Login";
+                // ReturnUrlParameter requires 
+                //using Microsoft.AspNetCore.Authentication.Cookies;
+                options.ReturnUrlParameter = CookieAuthenticationDefaults.ReturnUrlParameter;
                 options.SlidingExpiration = true;
             });
 
+            #endregion Cookie
+
             services.AddSingleton<IEmailSender, EmailSender>();
+
+            #region Views and Controllers
+
+            services.AddControllersWithViews();
+            services.AddRazorPages();
+
+            #endregion Views and Controllers
+
+            #region Password Hashing
+
+            // Password Hashing
+            services.Configure<PasswordHasherOptions>(option =>
+            {
+                option.IterationCount = 12000;
+            });
+
+            #endregion Password Hashing
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
