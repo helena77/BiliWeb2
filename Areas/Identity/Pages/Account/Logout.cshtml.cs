@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BiliWeb2.Backend.IdentityUser;
 using BiliWeb2.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -32,7 +33,7 @@ namespace BiliWeb2.Areas.Identity.Pages.Account
             await _signInManager.SignOutAsync();
 
             // Update local cache
-            // UserHelper.SetCurrentUser(null);
+            UserHelper.SetCurrentUser(null);
 
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
