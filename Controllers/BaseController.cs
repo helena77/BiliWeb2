@@ -44,6 +44,7 @@ namespace BiliWeb2.Controllers
         /// </summary>
         /// <param name="httpContextAccessor"></param>
         /// <param name="userManager"></param>
+        /// <param name="signInManager"></param>
         public BaseController(
             IHttpContextAccessor httpContextAccessor,
             UserManager<TechnicianModel> userManager,

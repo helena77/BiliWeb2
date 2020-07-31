@@ -1,4 +1,6 @@
-﻿using BiliWeb2.Models;
+﻿using BiliWeb2.Backend.IdentityRole;
+using BiliWeb2.Backend.IdentityUser;
+using BiliWeb2.Models;
 using BiliWeb2.Models.Enum;
 using System;
 using System.Collections.Generic;
@@ -19,14 +21,14 @@ namespace BiliWeb2.Backend
         /// 
 
         // Add YourName Below Here  #1, at the top of the stack, not the bottom
-        //public RoleBackend RoleBackend;
-        //public UserBackend UserBackend;
+        public RoleBackend RoleBackend;
+        public UserBackend UserBackend;
         
         private DataSourceBackend()
         {
             // Add YourName Below Here #2, at the top of the stack, not the bottom
-            //RoleBackend = new RoleBackend(1);
-            //UserBackend = new UserBackend(1);            
+            RoleBackend = new RoleBackend(1);
+            UserBackend = new UserBackend(1);            
         }
 
         /// <summary>
