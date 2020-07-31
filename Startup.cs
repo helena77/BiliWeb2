@@ -30,13 +30,42 @@ namespace BiliWeb2
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            #region Session
+
+            // IDistributedCache memory caches. 
+            // The IDistributedCache implementation is used as a backing store for session.
+            services.AddDistributedMemoryCache();
+
+            //A call to AddSession
+            // Session uses a cookie to track and identify requests from a single browser. 
+            // By default, this cookie is named .AspNetCore.Session, and it uses a path of /. 
+            // Because the cookie default doesn't specify a domain, 
+            // it isn't made available to the client-side script on the page (because HttpOnly defaults to true).
+            services.AddSession(options =>
+            {
+                options.Cookie.Name = ".AdventureWorks.Session";
+                // The app uses the IdleTimeout property to determine how long a session can be idle before its contents in the server's cache are abandoned. 
+                // This property is independent of the cookie expiration.
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+                options.Cookie.IsEssential = true;
+            });
+
+            #endregion Session
+
+            #region DbContext
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+
+            #endregion DbContext
+
             services.AddIdentity<TechnicianModel, IdentityRole>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddControllersWithViews();
             services.AddRazorPages();
+
+            #region Password
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -48,16 +77,13 @@ namespace BiliWeb2
                 options.Password.RequiredLength = 6;
                 options.Password.RequiredUniqueChars = 1;
 
-                // Lockout settings.
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
-
                 // User settings.
                 options.User.AllowedUserNameCharacters =
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = false;
             });
+
+            #endregion Password
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -94,6 +120,10 @@ namespace BiliWeb2
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            // A call to UseSession
+            // Call UserSession after UseRouting and before UseEndpoints
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

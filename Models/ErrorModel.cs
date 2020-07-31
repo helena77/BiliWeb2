@@ -1,8 +1,8 @@
 using System;
 
-namespace BiliWeb2.Models
+namespace BiliWeb2.Models.ViewModels
 {
-    public class ErrorViewModel
+    public class ErrorModel
     {
         public string RequestId { get; set; }
 
