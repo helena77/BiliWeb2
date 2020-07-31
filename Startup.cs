@@ -45,7 +45,8 @@ namespace BiliWeb2
             services.AddSession(options =>
             {
                 options.Cookie.Name = ".AdventureWorks.Session";
-                // The app uses the IdleTimeout property to determine how long a session can be idle before its contents in the server's cache are abandoned. 
+                // The app uses the IdleTimeout property to determine how long a session can be idle before its contents
+                // in the server's cache are abandoned. 
                 // This property is independent of the cookie expiration.
                 options.IdleTimeout = TimeSpan.FromSeconds(10);
                 options.Cookie.IsEssential = true;
